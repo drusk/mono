@@ -332,7 +332,10 @@ small_id_alloc (MonoThread *thread)
 
 	if (!small_id_table) {
 		small_id_table_size = 2;
+		heap_boss_next_boehm_alloc_is_well_known();
 		small_id_table = mono_gc_alloc_fixed (small_id_table_size * sizeof (MonoThread*), NULL);
+		// BOSSFIGHT:
+		mono_profiler_thread_table_allocation(small_id_table, 0, small_id_table_size);
 	}
 	for (i = small_id_next; i < small_id_table_size; ++i) {
 		if (!small_id_table [i]) {
@@ -354,11 +357,14 @@ small_id_alloc (MonoThread *thread)
 		if (new_size >= (1 << 16))
 			g_assert_not_reached ();
 		id = small_id_table_size;
+		heap_boss_next_boehm_alloc_is_well_known();
 		new_table = mono_gc_alloc_fixed (new_size * sizeof (MonoThread*), NULL);
 		memcpy (new_table, small_id_table, small_id_table_size * sizeof (void*));
 		mono_gc_free_fixed (small_id_table);
 		small_id_table = new_table;
 		small_id_table_size = new_size;
+		// BOSSFIGHT:
+		mono_profiler_thread_table_allocation(small_id_table, id + 1, small_id_table_size);
 	}
 	thread->small_id = id;
 	g_assert (small_id_table [id] == NULL);
@@ -3605,7 +3611,10 @@ mono_alloc_static_data (gpointer **static_data_ptr, guint32 offset)
 
 	gpointer* static_data = *static_data_ptr;
 	if (!static_data) {
+		heap_boss_next_boehm_alloc_is_well_known();
 		static_data = mono_gc_alloc_fixed (static_data_size [0], NULL);
+		// BOSSFIGHT:
+		mono_profiler_thread_statics_allocation(static_data, static_data_size[0]);
 		*static_data_ptr = static_data;
 		static_data [0] = static_data;
 	}
@@ -3613,7 +3622,10 @@ mono_alloc_static_data (gpointer **static_data_ptr, guint32 offset)
 	for (i = 1; i <= idx; ++i) {
 		if (static_data [i])
 			continue;
+		heap_boss_next_boehm_alloc_is_well_known();
 		static_data [i] = mono_gc_alloc_fixed (static_data_size [i], NULL);
+		// BOSSFIGHT:
+		mono_profiler_thread_statics_allocation(static_data[i], static_data_size[i]);
 	}
 }
 

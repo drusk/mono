@@ -1764,6 +1764,7 @@ mono_class_create_runtime_vtable (MonoDomain *domain, MonoClass *class, gboolean
 	guint32 cindex;
 	gpointer iter;
 	gpointer *interface_offsets;
+	gboolean notify_profiler_of_class_statics = FALSE;
 
 	mono_loader_lock (); /*FIXME mono_class_init acquires it*/
 	mono_domain_lock (domain);
@@ -1875,10 +1876,14 @@ mono_class_create_runtime_vtable (MonoDomain *domain, MonoClass *class, gboolean
 			bitmap = compute_class_bitmap (class, default_bitmap, sizeof (default_bitmap) * 8, 0, &max_set, TRUE);
 			/*g_print ("bitmap 0x%x for %s.%s (size: %d)\n", bitmap [0], class->name_space, class->name, class_size);*/
 			statics_gc_descr = mono_gc_make_descr_from_bitmap (bitmap, max_set + 1);
+			heap_boss_next_boehm_alloc_is_well_known();
 			vt->data = mono_gc_alloc_fixed (class_size, statics_gc_descr);
 			mono_domain_add_class_static_data (domain, class, vt->data, NULL);
 			if (bitmap != default_bitmap)
 				g_free (bitmap);
+
+			// BOSSFIGHT: track static fields allocations
+			notify_profiler_of_class_statics = TRUE;
 		} else {
 			vt->data = mono_domain_alloc0 (domain, class_size);
 		}
@@ -2030,6 +2035,12 @@ mono_class_create_runtime_vtable (MonoDomain *domain, MonoClass *class, gboolean
 		vt->remote = 1;
 	else
 		vt->remote = 0;
+
+	// BOSSFIGHT: Knowing the vtable address can help spot objects when scanning the heap
+	mono_profiler_class_vtable_created(domain, class, vt);
+	// BOSSFIGHT: track static fields allocations
+	if (G_UNLIKELY(profile_allocs) && notify_profiler_of_class_statics)
+		mono_profiler_class_statics_allocation(domain, class, vt->data, class_size);
 
 	return vt;
 }
@@ -3291,6 +3302,9 @@ mono_set_commandline_arguments(int argc, const char* argv[], const char* basedir
 	//this should only be called once
 	g_assert(main_args==NULL);
 
+	// BOSSFIGHT: moved from mono_unity_set_embeddinghostname so we can use in release builds of Unity Player
+	heap_boss_startup("heap-boss");
+
 	main_args = g_new0 (char*, argc);
 	num_main_args = argc;
 
@@ -3883,6 +3897,7 @@ mono_object_allocate (size_t size, MonoVTable *vtable)
 {
 	MonoObject *o;
 	mono_stats.new_object_count++;
+	heap_boss_next_boehm_alloc_is_well_known();
 	ALLOC_OBJECT (o, vtable, size);
 
 	return o;
@@ -3900,6 +3915,7 @@ mono_object_allocate_ptrfree (size_t size, MonoVTable *vtable)
 {
 	MonoObject *o;
 	mono_stats.new_object_count++;
+	heap_boss_next_boehm_alloc_is_well_known();
 	ALLOC_PTRFREE (o, vtable, size);
 	return o;
 }
@@ -3908,6 +3924,7 @@ static inline void *
 mono_object_allocate_spec (size_t size, MonoVTable *vtable)
 {
 	void *o;
+	heap_boss_next_boehm_alloc_is_well_known();
 	ALLOC_TYPED (o, size, vtable);
 	mono_stats.new_object_count++;
 
@@ -3990,11 +4007,14 @@ mono_object_new_alloc_specific (MonoVTable *vtable)
 /*		printf("OBJECT: %s.%s.\n", vtable->klass->name_space, vtable->klass->name); */
 		o = mono_object_allocate (vtable->klass->instance_size, vtable);
 	}
-	if (G_UNLIKELY (vtable->klass->has_finalize))
-		mono_object_register_finalizer (o);
 	
 	if (G_UNLIKELY (profile_allocs))
 		mono_profiler_allocation (o, vtable->klass);
+
+	// BOSSFIGHT: moved this from before  mono_profiler_allocation as it causes a libgc allocation too (so it intereferes with boehm<->object alloc matching
+	if (G_UNLIKELY(vtable->klass->has_finalize))
+		mono_object_register_finalizer(o);
+
 	return o;
 }
 
@@ -4002,6 +4022,7 @@ MonoObject*
 mono_object_new_fast (MonoVTable *vtable)
 {
 	MonoObject *o;
+	heap_boss_next_boehm_alloc_is_well_known();
 	ALLOC_TYPED (o, vtable->klass->instance_size, vtable);
 	return o;
 }
@@ -4010,6 +4031,7 @@ static MonoObject*
 mono_object_new_ptrfree (MonoVTable *vtable)
 {
 	MonoObject *obj;
+	heap_boss_next_boehm_alloc_is_well_known();
 	ALLOC_PTRFREE (obj, vtable, vtable->klass->instance_size);
 #if NEED_TO_ZERO_PTRFREE
 	/* an inline memset is much faster for the common vcase of small objects
@@ -4034,6 +4056,7 @@ static MonoObject*
 mono_object_new_ptrfree_box (MonoVTable *vtable)
 {
 	MonoObject *obj;
+	heap_boss_next_boehm_alloc_is_well_known();
 	ALLOC_PTRFREE (obj, vtable, vtable->klass->instance_size);
 	/* the object will be boxed right away, no need to memzero it */
 	return obj;
@@ -4599,8 +4622,9 @@ mono_value_box (MonoDomain *domain, MonoClass *class, gpointer value)
 		return NULL;
 	size = mono_class_instance_size (class);
 	res = mono_object_new_alloc_specific (vtable);
-	if (G_UNLIKELY (profile_allocs))
-		mono_profiler_allocation (res, class);
+	// BOSSFIGHT: avoid duplicate alloc notification when boxing (mono_object_new_alloc_specific already does this)
+//	if (G_UNLIKELY (profile_allocs))
+//		mono_profiler_allocation (res, class);
 
 	size = size - sizeof (MonoObject);
 

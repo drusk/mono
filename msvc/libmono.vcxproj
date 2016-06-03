@@ -171,7 +171,7 @@
       <Command>echo #define FULL_VERSION "Visual Studio built mono" &gt; ..\mono\mini\version.h</Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalOptions>/D /NODEFAULTLIB:LIBCD" " %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D /NODEFAULTLIB:LIBCD" "  /Qvec-report:2 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -216,7 +216,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D /NODEFAULTLIB:LIBCD" " %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D /NODEFAULTLIB:LIBCD" "  /Qvec-report:2 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -342,8 +342,8 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\libgc\include;..\;..\eglib\src;..\mono;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_X86;_DEBUG;__i386__;TARGET_X86;i386;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WINVER=0x0500;_WIN32_WINNT=0x0500;_WIN32_IE=0x0501;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libgc\include;..\;..\mono\;..\mono\jit;..\eglib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_X86;_DEBUG;__i386__;i386;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -388,8 +388,8 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\libgc\include;..\;..\mono\;..\mono\jit;..\mono\eglib\src;..\..\mono\eglib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;__x86_64__;TARGET_AMD64;WIN64;_WIN64;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WINVER=0x0500;_WIN32_WINNT=0x0500;_WIN32_IE=0x0501;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libgc\include;..\;..\mono\;..\mono\jit;..\eglib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;__x86_64__;TARGET_AMD64;WIN64;_WIN64;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -429,8 +429,8 @@
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\libgc\include;..\;..\eglib\src;..\mono;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;__i386__;TARGET_X86;i386;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WINVER=0x0500;_WIN32_WINNT=0x0500;_WIN32_IE=0x0501;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libgc\include;..\;..\mono\;..\mono\jit;..\eglib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;__i386__;TARGET_X86;i386;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -440,6 +440,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>CompileAsC</CompileAs>
       <ForcedIncludeFiles>unity/libmono_vcdefs.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -474,8 +475,8 @@
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\libgc\include;..\;..\eglib\src;..\mono;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;__x86_64__;TARGET_AMD64;WIN64;_WIN64;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WINVER=0x0500;_WIN32_WINNT=0x0500;_WIN32_IE=0x0501;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\libgc\include;..\;..\mono\;..\mono\jit;..\eglib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;__x86_64__;TARGET_AMD64;WIN64;_WIN64;WIN32;_WIN32;__WIN32__;_WINDOWS;WINDOWS;PLATFORM_WIN32;TARGET_WIN32;_CRT_SECURE_NO_DEPRECATE;GC_NOT_DLL;HAVE_CONFIG_H;WIN32_THREADS;FD_SETSIZE=1024;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -483,6 +484,8 @@
       </PrecompiledHeader>
       <PrecompiledHeaderOutputFile>.\Release/libmono.pch</PrecompiledHeaderOutputFile>
       <CompileAs>CompileAsC</CompileAs>
+      <OmitFramePointers>false</OmitFramePointers>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -569,6 +572,12 @@
     <ClInclude Include="..\config.h" />
     <ClInclude Include="..\mono\io-layer\io-layer.h" />
     <ClInclude Include="..\mono\mini\mini-windows.h" />
+    <ClInclude Include="..\mono\profiler\HeapBoss\Accountant.hpp" />
+    <ClInclude Include="..\mono\profiler\HeapBoss\BackTrace.hpp" />
+    <ClInclude Include="..\mono\profiler\HeapBoss\HeapBoss.h" />
+    <ClInclude Include="..\mono\profiler\HeapBoss\OutFileWriter.hpp" />
+    <ClInclude Include="..\mono\profiler\HeapBoss\OutFileWriterPriv.inl" />
+    <ClInclude Include="..\mono\profiler\HeapBoss\Stacktrace.hpp" />
     <ClInclude Include="..\mono\utils\dlmalloc.h" />
     <ClInclude Include="..\mono\utils\mono-codeman.h" />
     <ClInclude Include="..\mono\utils\mono-compiler.h" />
@@ -674,6 +683,53 @@
     <ClInclude Include="..\unity\libmono_vcdefs.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\mono\profiler\HeapBoss\Accountant.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib_xarm|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|x64'">CompileAsCpp</CompileAs>
+      <OmitDefaultLibName Condition="'$(Configuration)|$(Platform)'=='Release_eglib|x64'">true</OmitDefaultLibName>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\mono\profiler\HeapBoss\BackTrace.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib_xarm|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\mono\profiler\HeapBoss\HeapBoss.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib_xarm|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\mono\profiler\HeapBoss\OutFileWriter.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib_xarm|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\mono\profiler\HeapBoss\Stacktrace.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib_xarm|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release_eglib_xarm|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|x64'">Default</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\mono\utils\dlmalloc.c" />
     <ClCompile Include="..\mono\utils\mono-codeman.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug_eglib|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
